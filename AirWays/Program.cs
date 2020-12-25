@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace AirWays
 {
@@ -8,14 +9,34 @@ namespace AirWays
         {
             var random = new Random(DateTime.Now.Millisecond);
 
-            string[] models =
-                {"Boeing", "Cessna", "AeroStar", "Eagle", "Transtar", "CD Project Red", "Kojima Productions"};
-            string[] airportNames = {"Beijing Capital", "Los Angeles", "Dubai", "Tokyo", "London"};
+            string[] models;
+            string[] airportNames;
+            int airportsAmount;
+            int planesAmount;
+            try
+            {
+                if(args.Length == 0) throw new IndexOutOfRangeException("No File");
+                var lines = File.ReadAllLines(args[0]);
+                models = lines[0].Split(", ");
+                airportNames = lines[1].Split(", ");
+                airportsAmount = int.Parse(lines[2]);
+                planesAmount = int.Parse(lines[3]);
+                Console.WriteLine($"File {Path.GetFileName(args[0])} was read successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"There was an error opening file: {ex.Message}");
 
-            var airports = new Airport[5];
-            for (var i = 0; i < airports.Length; i++) airports[i] = new Airport(airportNames[i], 2);
+                models = new[] { "Boeing", "Cessna", "AeroStar", "Eagle", "Transtar", "CD Project Red", "Kojima Productions" };
+                airportNames = new[] { "Beijing Capital", "Los Angeles", "Dubai", "Tokyo", "London" };
+                airportsAmount = 5;
+                planesAmount = 15;
+            }
+            
+            var airports = new Airport[airportsAmount];
+            for (var i = 0; i < airportsAmount; i++) airports[i] = new Airport(airportNames[i], 2);
 
-            for (var i = 0; i < 20; i++)
+            for (var i = 0; i < planesAmount; i++)
             {
                 var plane = new Plane(models[random.Next(models.Length)], random.Next(100, 1000),
                     random.Next(100, 200));
@@ -32,6 +53,8 @@ namespace AirWays
             }
 
             foreach (var a in airports) Console.WriteLine(a);
+
+            Console.ReadKey();
         }
     }
 }
